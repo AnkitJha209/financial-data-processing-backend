@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
-import { RegisterInput, LoginInput } from "../schemas/auth.schema";
-// import { prisma } from "../prismaClient/client";
-import { hash } from "zod";
+import bcrypt from "bcrypt"
 import { hashPass } from "../utils/passwordEncryption";
 import { prisma } from "../prismaClient/client";
+import jwt from "jsonwebtoken"
 
 
 
@@ -38,15 +37,45 @@ export const register = async (req: Request, res: Response) => {
     }
 };
 
-export const login = (req: Request<{}, {}, LoginInput>, res: Response) => {
+export const login = async (req: Request, res: Response) => {
     try {
         const { email, password } = req.body;
-        // Data is already validated by Zod middleware
-        console.log("Login attempt:", { email });
+        const userExist = await prisma.user.findUnique({ where: { email } });
+        if(!userExist){
+            res.status(400).json({
+                success: false,
+                message: "User does not exist",
+            });
+            return;
+        }
 
-        res.status(200).json({
+        if(userExist.isDeleted){
+            res.status(400).json({
+                success: false,
+                message: "User account is deleted. Contact admin to restore."
+            });
+            return;
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, userExist.hashPassword)
+
+        if(!isPasswordValid){
+            res.status(400).json({
+                success: false,
+                message: "Invalid password",
+            });
+            return;
+        }
+
+        const token = jwt.sign({
+            userId: userExist.id,
+            role: userExist.role
+        }, process.env.JWT_SECRET_KEY || 'default_secret_key', { expiresIn: "1h" })
+
+        res.cookie("token", token, { httpOnly: true }).status(200).json({
             success: true,
             message: "Login successful",
+            data: { token },
         });
     } catch (error) {
         res.status(500).json({
@@ -56,9 +85,27 @@ export const login = (req: Request<{}, {}, LoginInput>, res: Response) => {
     }
 };
 
-export const me = (req: Request, res: Response) => {
-    res.status(200).json({
-        success: true,
-        data: { user: "current user" },
-    });
+export const me = async (req: Request, res: Response) => {
+    try {
+        const {id} = (req as any).user;
+        if(!id){
+            res.status(401).json({
+                success: false,
+                message: "Unauthorized",
+            });
+            return;
+        }
+        const userData = await prisma.user.findUnique({ where: { id }, select: { id: true, email: true, name: true, role: true } });
+        res.status(200).json({
+            success: true,
+            message: "User data retrieved successfully",
+            data: { user: userData },
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error retrieving user data",
+        });
+        return;
+    }
 };
