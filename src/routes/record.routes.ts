@@ -7,7 +7,7 @@ import { validate } from "../middlewares/validate";
 export const recordRoutes = express.Router();
 
 recordRoutes.get("/", verifyToken, getRecords);
-recordRoutes.post("/", verifyToken, verifyADMIN,validate(createRecordSchema), createRecord);
+recordRoutes.post("/", verifyToken, verifyADMIN, validate(createRecordSchema), createRecord);
 recordRoutes.get("/:id", verifyToken, getRecordById);
 recordRoutes.put("/:id", verifyToken, verifyADMIN, validate(updateRecordSchema), updateRecord);
 recordRoutes.delete("/:id", verifyToken, verifyADMIN, safeDeleteRecord);

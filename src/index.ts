@@ -3,6 +3,8 @@ import dotenv from "dotenv";
 import { authRoutes } from "./routes/auth.routes";
 import { dashboardRoutes } from "./routes/dashboard.routes";
 import { exportRoutes } from "./routes/export.routes";
+import { recordRoutes } from "./routes/record.routes";
+import { adminRoutes } from "./routes/admin.routes";
 
 dotenv.config();
 
@@ -16,15 +18,12 @@ app.get("/", (req, res) => {
     res.send("Hello World!");
 });
 
-// Mount auth routes with validation
 app.use("/api/auth", authRoutes);
-
-// Mount dashboard routes
 app.use("/api/dashboard", dashboardRoutes);
-
-// Mount export routes
 app.use("/api/export", exportRoutes);
+app.use("/api/records", recordRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
+    console.log(`Server listening on port ${port}`);
 });
