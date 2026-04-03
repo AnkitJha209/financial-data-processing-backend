@@ -23,6 +23,26 @@ enum Type {
   EXPENSE
 }
 
+enum Category {
+  // Income categories
+  SALARY
+  FREELANCE
+  INVESTMENT
+  BUSINESS
+  BONUS
+  OTHER_INCOME
+  // Expense categories
+  RENT
+  FOOD
+  UTILITIES
+  TRANSPORT
+  HEALTHCARE
+  EDUCATION
+  ENTERTAINMENT
+  SHOPPING
+  OTHER_EXPENSE
+}
+
 model User {
   id            String      @id @default(cuid())
   name          String
@@ -42,6 +62,7 @@ model Record {
   userId      String
   amount      Float
   type        Type        @default(EXPENSE)
+  category    Category
   description String?
   isDeleted   Boolean     @default(false)
   date        DateTime

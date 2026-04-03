@@ -1,12 +1,12 @@
 import express from "express"
-import { getUserById, getUsers, updateUserRole } from "../controllers/admin.controller";
+import { deleteUser, getUserById, getUsers, updateUserRole } from "../controllers/admin.controller";
 import { validate } from "../middlewares/validate";
 import { updateUserRoleSchema } from "../schemas/admin.schema";
+import { verifyADMIN, verifyToken } from "../middlewares/auth.middleware";
 
 export const adminRoutes = express.Router();
 
-adminRoutes.get("/users", getUsers);
-
-adminRoutes.get("/users/:id", getUserById);
-
-adminRoutes.put("/users/:id/role", validate(updateUserRoleSchema), updateUserRole);
+adminRoutes.get("/users", verifyToken, verifyADMIN, getUsers);
+adminRoutes.get("/users/:id", verifyToken, verifyADMIN, getUserById);
+adminRoutes.put("/users/:id/role", verifyToken, verifyADMIN, validate(updateUserRoleSchema), updateUserRole);
+adminRoutes.delete("/users/:id", verifyToken, verifyADMIN, deleteUser);

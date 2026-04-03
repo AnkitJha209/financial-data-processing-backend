@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-export const recordSchema = z.object({
+export const createRecordSchema = z.object({
     amount: z.number().positive("Amount must be a positive number"),
     type: z.enum(
         ["INCOME", "EXPENSE"],
@@ -13,13 +13,19 @@ export const recordSchema = z.object({
     date: z
         .string()
         .refine((date) => !isNaN(Date.parse(date)), "Invalid date format"),
+    category: z.enum(
+        ['SALARY', 'FREELANCE', 'INVESTMENT', 'BUSINESS', 'BONUS', 'OTHER_INCOME',
+        'RENT', 'FOOD', 'UTILITIES', 'TRANSPORT', 'HEALTHCARE',
+        'EDUCATION', 'ENTERTAINMENT', 'SHOPPING', 'OTHER_EXPENSE'],
+        "Category must be a valid option",
+    ),
 });
 
-export const updateRecordSchema = recordSchema
+export const updateRecordSchema = createRecordSchema
     .partial()
     .refine((data) => Object.keys(data).length > 0, {
         message: "At least one field is required for update",
     });
 
-export type RecordInput = z.infer<typeof recordSchema>;
+export type CreateRecordInput = z.infer<typeof createRecordSchema>;
 export type UpdateRecordInput = z.infer<typeof updateRecordSchema>;

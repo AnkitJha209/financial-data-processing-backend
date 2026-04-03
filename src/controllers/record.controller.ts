@@ -4,7 +4,7 @@ import { prisma } from "../prismaClient/client";
 
 export const createRecord = async (req: Request, res: Response) => {
     try {
-        const { amount, type, description, date } = req.body;
+        const { amount, type, description, date, category } = req.body;
         const userId = (req as any).user.id;
 
         const newRecord = await prisma.record.create({
@@ -13,6 +13,7 @@ export const createRecord = async (req: Request, res: Response) => {
                 type,
                 description,
                 date: new Date(date),
+                category,
                 userId,
             },
         });
@@ -34,7 +35,7 @@ export const createRecord = async (req: Request, res: Response) => {
 export const updateRecord = async (req: Request, res: Response) => {
     try {
         const recordId = req.params.id as string;
-        const { amount, type, description, date } = req.body;
+        const { amount, type, description, date, category } = req.body;
         const userId = (req as any).user.id;
 
         const existingRecord = await prisma.record.findUnique({
@@ -62,12 +63,14 @@ export const updateRecord = async (req: Request, res: Response) => {
             type?: "INCOME" | "EXPENSE";
             description?: string;
             date?: Date;
+            category?: "SALARY" | "FREELANCE" | "INVESTMENT" | "BUSINESS" | "BONUS" | "OTHER_INCOME" | "RENT" | "FOOD" | "UTILITIES" | "TRANSPORT" | "HEALTHCARE" | "EDUCATION" | "ENTERTAINMENT" | "SHOPPING" | "OTHER_EXPENSE";
         } = {};
 
         if (amount !== undefined) dataToUpdate.amount = amount;
         if (type !== undefined) dataToUpdate.type = type;
         if (description !== undefined) dataToUpdate.description = description;
         if (date !== undefined) dataToUpdate.date = new Date(date);
+        if (category !== undefined) dataToUpdate.category = category;
 
         const updatedRecord = await prisma.record.update({
             where: { id: recordId },
@@ -133,4 +136,53 @@ export const safeDeleteRecord = async (req: Request, res: Response) => {
 
 
 // ----------- get records for a user with pagination and filtering -----------
-// ----------- one more thing to add category in record model and filter by category as well -----------
+export const getRecords = async (req: Request, res: Response) => {
+    try {
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+
+        const record = await prisma.record.findMany({
+            where: {
+                isDeleted: false,
+            },
+            skip: (page - 1) * limit,
+            take: limit,
+        });
+        res.status(200).json({
+            success: true,
+            data: record,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error fetching records",
+        });
+        return;
+    }
+};
+
+export const getRecordById = async (req: Request, res: Response) => {
+    try {
+        const recordId = req.params.id as string;
+        const record = await prisma.record.findUnique({
+            where: { id: recordId, isDeleted: false },
+        });
+        if (!record) {
+            res.status(404).json({
+                success: false,
+                message: "Record not found",
+            });
+            return;
+        }
+        res.status(200).json({
+            success: true,
+            data: record,
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Error fetching record",
+        });
+        return;
+    }
+};

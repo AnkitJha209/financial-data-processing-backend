@@ -7,8 +7,6 @@ import { verifyToken } from "../middlewares/auth.middleware";
 export const authRoutes = express.Router();
 
 authRoutes.post("/register", validate(registerSchema), register);
-
 authRoutes.post("/login", validate(loginSchema), login);
-
 authRoutes.get("/me", verifyToken, me);
 

@@ -9,6 +9,7 @@
         "strict": true /* Enable all strict type-checking options. */,
         "skipLibCheck": true /* Skip type checking all .d.ts files. */,
         "moduleResolution": "node",
+        "ignoreDeprecations": "6.0",
         "declaration": true,
         "declarationMap": true,
         "sourceMap": true

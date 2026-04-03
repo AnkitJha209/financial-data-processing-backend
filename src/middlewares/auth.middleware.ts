@@ -81,30 +81,3 @@ export const verifyANALYSTorADMIN = (req: Request, res: Response, next: NextFunc
         return;
     }
 }
-
-export const verifyVIEWER = (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const user = (req as any).user;
-        if (!user) {
-            res.status(401).json({
-                success: false,
-                message: "Unauthorized",
-            });
-            return;
-        }
-        if (user.role !== "VIEWER" && user.role !== "ANALYST" && user.role !== "ADMIN") {
-            res.status(403).json({
-                success: false,
-                message: "Forbidden",
-            });
-            return;
-        }
-        next();
-    } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Error verifying viewer privileges",
-        });
-        return;
-    }
-}
