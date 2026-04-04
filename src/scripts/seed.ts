@@ -1,6 +1,6 @@
 import { prisma } from "../prismaClient/client";
 import { hashPass } from "../utils/passwordEncryption";
-import { Category, Role, Type } from "../../generated/prisma/enums";
+import { Category, Type } from "../../generated/prisma/enums";
 
 const createSampleRecords = async (userId: string) => {
     const today = new Date();
@@ -63,54 +63,31 @@ const run = async () => {
         const adminPassword = await hashPass("Admin@123");
         const analystPassword = await hashPass("Analyst@123");
 
-        const adminUser = await prisma.user.upsert({
-            where: { email: "admin@zorvyn.com" },
-            update: {
-                name: "System Admin",
-                role: Role.ADMIN,
-                hashPassword: adminPassword,
-                status: true,
-                isDeleted: false,
-            },
-            create: {
+        const adminUser = await prisma.user.create({
+            data: {
                 name: "System Admin",
                 email: "admin@zorvyn.com",
                 hashPassword: adminPassword,
-                role: Role.ADMIN,
+                role: "ADMIN",
             },
         });
 
-        const analystUser = await prisma.user.upsert({
-            where: { email: "analyst@zorvyn.com" },
-            update: {
-                name: "Finance Analyst",
-                role: Role.ANALYST,
-                hashPassword: analystPassword,
-                status: true,
-                isDeleted: false,
-            },
-            create: {
+        const analystUser = await prisma.user.create({
+            data: {
                 name: "Finance Analyst",
                 email: "analyst@zorvyn.com",
                 hashPassword: analystPassword,
-                role: Role.ANALYST,
+                role: "ANALYST",
             },
         });
 
-        // Re-seed records for deterministic demo data.
-        await prisma.record.deleteMany({
-            where: {
-                userId: analystUser.id,
-            },
-        });
-
-        await createSampleRecords(analystUser.id);
+        await createSampleRecords(adminUser.id);
 
         console.log("Seed completed successfully.");
         console.log("Users created/updated:");
         console.log(`- ${adminUser.email} (ADMIN)`);
         console.log(`- ${analystUser.email} (ANALYST)`);
-        console.log("Sample records created for analyst user.");
+        console.log("Sample records created for admin user.");
         console.log("Login passwords:");
         console.log("- Admin: Admin@123");
         console.log("- Analyst: Analyst@123");

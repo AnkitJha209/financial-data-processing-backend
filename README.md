@@ -72,12 +72,6 @@ PORT=3000
 ### 6) Run Prisma migrations
 
 ```bash
-npx prisma migrate deploy
-```
-
-If you are actively developing schema changes, you can use:
-
-```bash
 npx prisma migrate dev
 ```
 
@@ -85,6 +79,12 @@ npx prisma migrate dev
 
 ```bash
 npx prisma generate
+```
+
+Run this to get dummy data in the current table
+
+```bash
+npm run seed
 ```
 
 ### 8) Start backend
@@ -235,9 +235,9 @@ Seed file added at:
 
 What it does:
 
-- Creates or updates sample users with fixed emails and roles.
-- Creates sample financial records for the analyst user.
-- Resets only analyst records before inserting fresh sample data, so demo output stays predictable.
+- Creates sample users with fixed emails and roles.
+- Creates sample financial records for the admin user.
+- Uses create-only user insertion (does not update existing users).
 
 Sample credentials after seeding:
 
@@ -253,6 +253,10 @@ Why use seed data:
 
 - Quickly test login, dashboard, and export APIs.
 - Keep demo and QA environments consistent.
+
+Important note:
+
+- Since seed uses create-only for users, running npm run seed multiple times without resetting or cleaning data may fail with duplicate email errors.
 
 ## Folder Structure
 
