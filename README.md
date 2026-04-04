@@ -158,6 +158,17 @@ Authorization: Bearer <token>
         - fromDate=YYYY-MM-DD
         - toDate=YYYY-MM-DD
 
+### Chat Assistant
+
+- POST /api/chat/records
+    - Body:
+        - question: string
+    - Auth: Bearer token required
+    - Behavior:
+        - The AI only generates a read-only plan.
+        - The server executes Prisma read queries only.
+        - No update, delete, insert, or raw SQL execution is allowed.
+
 ### Admin
 
 - GET /api/admin/users
@@ -180,6 +191,7 @@ Authorization: Bearer <token>
 - Soft delete is used for records via isDeleted=true.
 - Export endpoints are intended for ANALYST or ADMIN roles.
 - Dates in query params are provided in ISO-friendly format (prefer YYYY-MM-DD).
+- The chat assistant uses `OPENAI_API_KEY` and optional `OPENAI_MODEL` / `OPENAI_BASE_URL` if you want model-generated answers. Without an API key, the endpoint still returns the queried data plus a local fallback summary.
 
 ## Tradeoffs Considered
 

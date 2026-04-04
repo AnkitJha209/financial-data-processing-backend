@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { authRoutes } from "./routes/auth.routes";
 import { dashboardRoutes } from "./routes/dashboard.routes";
 import { exportRoutes } from "./routes/export.routes";
+import { chatRoutes } from "./routes/chat.routes";
 import { recordRoutes } from "./routes/record.routes";
 import { adminRoutes } from "./routes/admin.routes";
 
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/export", exportRoutes);
+app.use("/api/chat", chatRoutes);
 app.use("/api/records", recordRoutes);
 app.use("/api/admin", adminRoutes);
 
