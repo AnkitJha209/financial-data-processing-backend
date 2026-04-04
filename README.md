@@ -12,6 +12,7 @@ A TypeScript + Express + Prisma backend for financial record management, dashboa
 - JWT Authentication
 - Zod Validation
 - json2csv (CSV export)
+- OpenAI SDK (used with Gemini OpenAI-compatible endpoint)
 
 ## Prerequisites
 
@@ -64,6 +65,7 @@ Create a .env file in the project root:
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/financial"
 JWT_SECRET_KEY="your_super_secret_key"
+GEMINI_API_KEY="your_gemini_api_key"
 PORT=3000
 ```
 
@@ -99,9 +101,7 @@ Server starts on:
 
 Current script behavior:
 
-- npm run dev compiles TypeScript and runs dist/index.js.
-
-If you need watch mode later, add scripts such as ts-node-dev or nodemon.
+- npm run dev runs the server in watch mode using tsx: `tsx watch src/index.ts`.
 
 ## API Base URL
 
@@ -131,6 +131,11 @@ Authorization: Bearer <token>
 - PUT /api/records/:id
 - DELETE /api/records/:id
 
+Access rules in code:
+
+- GET endpoints require authenticated user (`verifyToken`).
+- POST/PUT/DELETE endpoints require ADMIN role (`verifyADMIN`).
+
 ### Dashboard
 
 - GET /api/dashboard/summary
@@ -158,6 +163,10 @@ Authorization: Bearer <token>
         - fromDate=YYYY-MM-DD
         - toDate=YYYY-MM-DD
 
+Access rules in code:
+
+- Export endpoints require authenticated ANALYST or ADMIN (`verifyANALYSTorADMIN`).
+
 ### Chat Assistant
 
 - POST /api/chat/records
@@ -165,9 +174,9 @@ Authorization: Bearer <token>
         - question: string
     - Auth: Bearer token required
     - Behavior:
-        - The AI only generates a read-only plan.
-        - The server executes Prisma read queries only.
-        - No update, delete, insert, or raw SQL execution is allowed.
+        - The endpoint calls Gemini (via OpenAI-compatible API) to generate a SQL statement.
+        - The server blocks responses that start with `BLOCKED:`.
+        - If accepted, SQL is executed and result is sent back to Gemini for natural-language answer generation.
 
 ### Admin
 
@@ -191,7 +200,7 @@ Authorization: Bearer <token>
 - Soft delete is used for records via isDeleted=true.
 - Export endpoints are intended for ANALYST or ADMIN roles.
 - Dates in query params are provided in ISO-friendly format (prefer YYYY-MM-DD).
-- The chat assistant uses `OPENAI_API_KEY` and optional `OPENAI_MODEL` / `OPENAI_BASE_URL` if you want model-generated answers. Without an API key, the endpoint still returns the queried data plus a local fallback summary.
+- Chat assistant uses `GEMINI_API_KEY` and Gemini OpenAI-compatible base URL configured in code.
 
 ## Tradeoffs Considered
 
@@ -199,7 +208,7 @@ Authorization: Bearer <token>
     - Some analytics are computed in application code after fetching records. This keeps implementation easy to read, but may be less efficient on very large datasets.
 
 - Single dev script:
-    - Current npm run dev does compile + run once (no auto-reload). This is stable and simple, but less convenient than watch mode.
+    - Current npm run dev uses `tsx watch` for local development. It is convenient for dev, but there is no dedicated production start script documented.
 
 - Role-protected exports:
     - Restricting export endpoints improves data governance but limits access for viewer-only users.
@@ -258,6 +267,7 @@ Zorvyn-Assignment/
 |   |-- controllers/
 |   |   |-- admin.controller.ts
 |   |   |-- auth.controller.ts
+|   |   |-- chat.controller.ts
 |   |   |-- dashboard.controller.ts
 |   |   |-- export.controller.ts
 |   |   `-- record.controller.ts
@@ -269,13 +279,17 @@ Zorvyn-Assignment/
 |   |-- routes/
 |   |   |-- admin.routes.ts
 |   |   |-- auth.routes.ts
+|   |   |-- chat.routes.ts
 |   |   |-- dashboard.routes.ts
 |   |   |-- export.routes.ts
-|   |   `-- record.controller.ts
+|   |   `-- record.routes.ts
 |   |-- schemas/
 |   |   |-- admin.schema.ts
 |   |   |-- auth.schema.ts
+|   |   |-- chat.schema.ts
 |   |   `-- record.schema.ts
+|   |-- scripts/
+|   |   `-- seed.ts
 |   `-- utils/
 |       `-- passwordEncryption.ts
 |-- prisma/
