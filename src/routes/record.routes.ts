@@ -20,7 +20,8 @@ export const recordRoutes = express.Router();
  * /api/records:
  *   get:
  *     tags: [Records]
- *     summary: Get paginated records
+ *     summary: Get paginated records with optional filters
+ *     description: Returns non-deleted records with optional filtering by type and category.
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -36,11 +37,42 @@ export const recordRoutes = express.Router();
  *           type: integer
  *           minimum: 1
  *           default: 10
+ *       - in: query
+ *         name: type
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [INCOME, EXPENSE]
+ *         description: Filter records by transaction type.
+ *       - in: query
+ *         name: category
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum:
+ *             - SALARY
+ *             - FREELANCE
+ *             - INVESTMENT
+ *             - BUSINESS
+ *             - BONUS
+ *             - OTHER_INCOME
+ *             - RENT
+ *             - FOOD
+ *             - UTILITIES
+ *             - TRANSPORT
+ *             - HEALTHCARE
+ *             - EDUCATION
+ *             - ENTERTAINMENT
+ *             - SHOPPING
+ *             - OTHER_EXPENSE
+ *         description: Filter records by category.
  *     responses:
  *       200:
  *         description: Records fetched successfully
  *       401:
  *         description: Unauthorized
+ *       500:
+ *         description: Error fetching records
  */
 recordRoutes.get("/", verifyToken, getRecords);
 

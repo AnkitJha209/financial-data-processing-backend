@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../prismaClient/client";
+// import { Record } from "../../generated/prisma/client";
 
 
 export const createRecord = async (req: Request, res: Response) => {
@@ -135,15 +136,18 @@ export const safeDeleteRecord = async (req: Request, res: Response) => {
 };
 
 
-// ----------- get records for a user with pagination and filtering -----------
 export const getRecords = async (req: Request, res: Response) => {
     try {
         const page = Number(req.query.page) || 1;
         const limit = Number(req.query.limit) || 10;
+        const type = req.query.type as "INCOME" | "EXPENSE" | undefined;
+        const category = req.query.category as string | undefined;
 
         const record = await prisma.record.findMany({
             where: {
                 isDeleted: false,
+                ...type && { type: type as any },
+                ...category && { category: category as any },
             },
             skip: (page - 1) * limit,
             take: limit,

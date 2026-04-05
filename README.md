@@ -124,7 +124,6 @@ Why this matters:
 - Protects APIs from brute-force attempts and traffic spikes.
 - Improves backend stability for real users.
 
-
 ### 2) API Documentation
 
 - Swagger UI enabled at:
@@ -136,7 +135,6 @@ Why this matters:
 
 - Makes your backend self-explanatory for interviewers, teammates, and frontend developers.
 - Speeds up API testing and onboarding.
-
 
 ## Authentication
 
@@ -157,6 +155,13 @@ Authorization: Bearer <token>
 ### Records
 
 - GET /api/records
+    - Query filters:
+        - page=<number> (default: 1)
+        - limit=<number> (default: 10)
+        - type=INCOME|EXPENSE
+        - category=<CATEGORY_ENUM>
+    - Behavior:
+        - Returns only non-deleted records (`isDeleted=false`).
 - POST /api/records
 - GET /api/records/:id
 - PUT /api/records/:id
