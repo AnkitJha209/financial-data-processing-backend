@@ -13,6 +13,8 @@ A TypeScript + Express + Prisma backend for financial record management, dashboa
 - Zod Validation
 - json2csv (CSV export)
 - OpenAI SDK (used with Gemini OpenAI-compatible endpoint)
+- express-rate-limit (API protection)
+- Swagger (OpenAPI documentation)
 
 ## Prerequisites
 
@@ -66,7 +68,7 @@ Create a .env file in the project root:
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/financial"
 JWT_SECRET_KEY="your_super_secret_key"
 GEMINI_API_KEY="your_gemini_api_key"
-PORT=3000
+PORT=8080
 ```
 
 ### 6) Run Prisma migrations
@@ -95,7 +97,7 @@ npm run dev
 
 Server starts on:
 
-- http://localhost:3000
+- http://localhost:8080
 
 ## Build/Run Notes
 
@@ -105,7 +107,36 @@ Current script behavior:
 
 ## API Base URL
 
-- http://localhost:3000/api
+- http://localhost:8080/api
+
+## Added Backend Essentials
+
+### 1) Rate Limiting
+
+- Global API rate limiting is enabled with `express-rate-limit`.
+- Applied in `src/index.ts` for all routes.
+- Default policy:
+    - window: 15 minutes
+    - max requests: 100 per IP
+
+Why this matters:
+
+- Protects APIs from brute-force attempts and traffic spikes.
+- Improves backend stability for real users.
+
+
+### 2) API Documentation
+
+- Swagger UI enabled at:
+    - `GET /api/docs`
+- Raw OpenAPI JSON enabled at:
+    - `GET /api/docs.json`
+
+Why this matters:
+
+- Makes your backend self-explanatory for interviewers, teammates, and frontend developers.
+- Speeds up API testing and onboarding.
+
 
 ## Authentication
 

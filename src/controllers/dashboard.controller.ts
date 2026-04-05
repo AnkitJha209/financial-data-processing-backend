@@ -179,8 +179,6 @@ export const getTrends = async (req: Request, res: Response) => {
     }
 };
 
-// GET /api/dashboard/recent - last N transactions
-// Query params: ?limit=10 (default)
 export const getRecent = async (req: Request, res: Response) => {
     try {
         const limit = Math.min(parseInt(req.query.limit as string) || 10, 100); // Max 100 records

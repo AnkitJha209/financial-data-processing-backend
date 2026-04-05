@@ -41,13 +41,12 @@ export const chatWithRecords = async (req: Request, res: Response) => {
 
                     STRICT RULES:
                     1. ALWAYS include WHERE "isDeleted" = false in every query
-                    2. ALWAYS filter by WHERE "userId" = '{{USER_ID}}' in every query
-                    3. Only generate SELECT statements — never UPDATE, INSERT, DELETE, DROP, ALTER, TRUNCATE or any other write operation
-                    4. Always use double quotes around column names and table name e.g. "Record"."amount"
-                    5. Never use * in SELECT — always name the columns explicitly
-                    6. Keep queries simple and readable
-                    7. For date filtering use DATE() function e.g. DATE("Record"."date")
-                    8. For monthly trends use DATE_TRUNC('month', "Record"."date")
+                    2. Only generate SELECT statements — never UPDATE, INSERT, DELETE, DROP, ALTER, TRUNCATE or any other write operation
+                    3. Always use double quotes around column names and table name e.g. "Record"."amount"
+                    4. Never use * in SELECT — always name the columns explicitly
+                    5. Keep queries simple and readable
+                    6. For date filtering use DATE() function e.g. DATE("Record"."date")
+                    7. For monthly trends use DATE_TRUNC('month', "Record"."date")
 
                     RESPONSE FORMAT — you must respond in one of two ways only:
 
@@ -62,10 +61,12 @@ export const chatWithRecords = async (req: Request, res: Response) => {
                 },
                 {
                     role: "user",
-                    content: "Explain to me how AI works",
+                    content: question,
                 },
             ],
         });
+
+        console.log(sql_query?.choices[0]?.message)
 
         if(sql_query?.choices[0]?.message?.content?.startsWith("BLOCKED:")) {
             res.status(400).json({ 
@@ -84,6 +85,8 @@ export const chatWithRecords = async (req: Request, res: Response) => {
         }
 
         const data = await prisma.$queryRawUnsafe(query)
+
+        console.log("Query Result:", data);
 
         const answerGeneration = await openai.chat.completions.create({
             model: "gemini-3-flash-preview",
@@ -113,6 +116,8 @@ export const chatWithRecords = async (req: Request, res: Response) => {
                 },
             ],
         });
+
+        console.log("Answer Generation:", answerGeneration?.choices[0]?.message?.content);
 
         const answer = answerGeneration?.choices[0]?.message?.content?.trim();
 
