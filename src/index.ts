@@ -8,6 +8,7 @@ import { recordRoutes } from "./routes/record.routes";
 import { adminRoutes } from "./routes/admin.routes";
 import { setupSwaggerDocs } from "./docs/swagger";
 import rateLimit from "express-rate-limit";
+import cors from "cors"
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ const limiter = rateLimit({
 app.use(express.json());
 app.use(urlencoded({ extended: true }));
 app.use(limiter);
+app.use(cors())
 
 app.get("/", (_req, res) => {
     res.send("Hello World!");
