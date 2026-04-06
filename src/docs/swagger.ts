@@ -14,9 +14,14 @@ const options: swaggerJSDoc.Options = {
         },
         servers: [
             {
+                url: "https://financial-data-processing-backend-2.onrender.com/",
+                description: "Production server hosted on Render",
+            },
+            {
                 url: "http://localhost:8080",
                 description: "Local development server",
-            },
+            }
+
         ],
         tags: [
             { name: "Auth", description: "Authentication and profile APIs" },
