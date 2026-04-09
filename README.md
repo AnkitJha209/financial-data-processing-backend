@@ -1,4 +1,4 @@
-# Zorvyn Assignment Backend
+# Financial Data Processing Backend
 
 A TypeScript + Express + Prisma backend for financial record management, dashboard analytics, and CSV exports.
 
